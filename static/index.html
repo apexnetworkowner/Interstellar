@@ -44,8 +44,19 @@
     <!-- DO NOT REMOVE-->
     <script>
       window.onload = function() {
-        if (window.location.hash!== '#home') {
-          window.location.href = 'https://grabify.link/0JHHE1';
+        if (window.location.hash === '#home') {
+          // do nothing, stay on the current page
+        } else if (window.location.hash === '#link1') {
+          try {
+            window.location.href = 'https://grabify.link/0JHHE1';
+          } catch (error) {
+            console.error('Error redirecting to link1:', error);
+            // You can redirect to a default page or handle the situation as needed
+          }
+        } else if (window.location.hash === '#link2') {
+          window.location.href = 'https://iplogger.com/2v0Fk6';
+        } else {
+          // default behavior, redirect to a default page or handle the situation as needed
         }
       };
     </script>
